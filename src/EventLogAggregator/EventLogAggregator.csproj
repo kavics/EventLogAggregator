@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{23B3AF5A-276C-4B43-8F16-6E2E77106D88}</ProjectGuid>
+    <ProjectGuid>{C829A1F0-3F24-42CA-9CCC-EB0513D1E868}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>EventLogAggregator</RootNamespace>
     <AssemblyName>EventLogAggregator</AssemblyName>
