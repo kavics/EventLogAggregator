@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Text;
 using System.Xml;
 
@@ -22,14 +24,32 @@ namespace SpaceBender.EventLogAggregator
         public DateTime TimeWritten { get; private set; }
         public string UserName { get; private set; }
 
-
-        internal static List<ILogEntry> LoadFrom(string computerName)
+        internal static List<ILogEntry> LoadFrom(string fileName)
+        {
+            var ext = Path.GetExtension(fileName).Trim('.').ToLowerInvariant();
+            if (ext == "xml")
+                return LoadFromXml(fileName);
+            if (ext == "evtx")
+                return LoadFromEvtx(fileName);
+            throw new NotSupportedException("File type is not supported: " + ext);
+        }
+        private static List<ILogEntry> LoadFromEvtx(string fileName)
+        {
+            var result = new List<ILogEntry>();
+            EventRecord record;
+            using (var reader = new EventLogReader(fileName, PathType.FilePath))
+                while ((record = reader.ReadEvent()) != null)
+                    using (record)
+                        result.Add(new WrappedEventRecord(record));
+            return result;
+        }
+        private static List<ILogEntry> LoadFromXml(string fileName)
         {
             var xml = new XmlDocument();
             var nsmgr = new XmlNamespaceManager(xml.NameTable);
             nsmgr.AddNamespace("x", "http://schemas.microsoft.com/win/2004/08/events/event");
 
-            xml.Load(computerName);
+            xml.Load(fileName);
 
             var result = new List<ILogEntry>();
 

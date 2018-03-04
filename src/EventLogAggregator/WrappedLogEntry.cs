@@ -21,9 +21,9 @@ namespace SpaceBender.EventLogAggregator
         public DateTime TimeWritten { get { return _source.TimeWritten; } }
         public string UserName { get { return _source.UserName; } }
 
-        public static WrappedLogEntry Create(EventLogEntry source)
+        public WrappedLogEntry(EventLogEntry source)
         {
-            return new WrappedLogEntry() { _source = source };
+           _source = source;
         }
     }
 }
