@@ -26,6 +26,7 @@ namespace SpaceBender.EventLogAggregator
         static void Run(string[] args)
         {
             //args = new[] { @"D:\Desktop\TPI_test\transformed\tc1web1 sensenet.xml" };
+            //args = new[] { @"D:\Desktop\SenseNet.xml" };
             args = new[] { @"D:\Desktop\SenseNet.evtx" };
 
             var computerName = args.Length == 0 ? Environment.MachineName : args[0];
@@ -96,7 +97,11 @@ namespace SpaceBender.EventLogAggregator
                 list.Add(entry);
             }
 
-            var ordered = grouped.Values.OrderBy(i => i.First().EntryType).ThenByDescending(i => i.Count).ToArray();
+            var ordered = grouped.Values
+                .OrderBy(i => i.First().EntryType)
+                .ThenByDescending(i => i.Count)
+                .ThenByDescending(i => i.First().Message)
+                .ToArray();
 
             using (var writer = new StreamWriter(errorsFileName))
             {
