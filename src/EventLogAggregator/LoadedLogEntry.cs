@@ -77,7 +77,7 @@ namespace SpaceBender.EventLogAggregator
                 var data = new StringBuilder();
                 foreach (XmlElement dataElement in item.SelectNodes("x:EventData/x:Data", nsmgr))
                     data.Append(dataElement.InnerText).Append(Environment.NewLine);
-                entry.Message = data.ToString();
+                entry.Message = data.ToString().Trim();
 
                 result.Add(entry);
             }

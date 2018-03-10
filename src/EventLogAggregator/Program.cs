@@ -72,7 +72,7 @@ namespace SpaceBender.EventLogAggregator
                 lastTime = entry.TimeGenerated;
                 if (entry.EntryType == EventLogEntryType.Error
                     || entry.EntryType == EventLogEntryType.Warning
-                     || entry.EntryType == EventLogEntryType.Information)
+                    || entry.EntryType == EventLogEntryType.Information)
                 {
                     if (entry.EntryType == EventLogEntryType.Error)
                         errorCount++;
@@ -82,7 +82,12 @@ namespace SpaceBender.EventLogAggregator
                 }
             }
 
-            //entries = entries.OrderBy(e => e.EntryType).ThenBy(e => e.Message).ThenBy(e => e.StackTrace).ToList();
+            if (lastTime < firstTime)
+            {
+                var d = lastTime;
+                lastTime = firstTime;
+                firstTime = d;
+            }
 
             var grouped = new Dictionary<int, List<DetailedLogEntry>>();
             foreach (var entry in detailedEntries)
@@ -114,7 +119,7 @@ namespace SpaceBender.EventLogAggregator
                 writer.WriteLine("Warning count: {0}", warningCount);
                 writer.WriteLine("Group count:   {0}", grouped.Count);
                 writer.WriteLine("==========================================================================");
-                writer.WriteLine("{0} Error message summary:", computerName);
+                writer.WriteLine(" Error message summary:");
                 writer.WriteLine("Count DiffMsg DiffStack        Type  Message");
                 writer.WriteLine("----- ------- --------- -----------  -------");
                 //                    3       3         3       Error  Invalid manifest: missing "ReleaseDate" element.
@@ -191,7 +196,7 @@ namespace SpaceBender.EventLogAggregator
                 writer.WriteLine("Entry count: {0}", entryCount);
                 writer.WriteLine("##########################################################################");
 
-                foreach (var entry in entries)
+                foreach (var entry in entries.OrderBy(e => e.TimeGenerated).ThenBy(e=>e.Message))
                 {
                     WriteEntry(entry, writer);
                     writer.WriteLine("##########################################################################");

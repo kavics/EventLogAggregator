@@ -27,7 +27,7 @@ namespace SpaceBender.EventLogAggregator
         public WrappedEventRecord(EventRecord source)
         {
 
-            //Category = 
+            Category = source.LogName;
             //CategoryNumber = 
             //Data = 
 
@@ -44,11 +44,11 @@ namespace SpaceBender.EventLogAggregator
             //Index = 
             //InstanceId = 
             MachineName = source.MachineName;
-            Message = source.Properties.First().Value.ToString();
+            Message = source.Properties.First().Value.ToString().Trim();
             //ReplacementStrings = 
             //Source = source.ProviderName?
-            TimeGenerated = source.TimeCreated ?? DateTime.MinValue;
-            //TimeWritten = 
+            TimeGenerated = (source.TimeCreated ?? DateTime.MinValue).ToUniversalTime();
+            TimeWritten = TimeGenerated;
             //UserName = 
         }
     }
