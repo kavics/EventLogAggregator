@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SenseNet.Tools.CommandLineArguments;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
@@ -15,7 +16,32 @@ namespace SpaceBender.EventLogAggregator
 
         static void Main(string[] args)
         {
-            Run(args);
+            //args = new[] { @"D:\Desktop\TPI_test\transformed\tc1web1 sensenet.xml" };
+            //args = new[] { @"D:\Desktop\SenseNet.xml" };
+            //args = new[] { @"D:\Desktop\SenseNet.evtx" };
+
+            var config = new Configuration();
+            try
+            {
+                var result = ArgumentParser.Parse(args, config);
+                if (result.IsHelp)
+                {
+                    // settings' properties are not filled, display the usage screen and exit
+                    Console.WriteLine(result.GetHelpText());
+                }
+                else
+                {
+                    // execute main logic with a filled config object
+                    Run(config);
+                }
+            }
+            catch (ParsingException e)
+            {
+                Console.WriteLine(e.FormattedMessage);
+                Console.WriteLine(e.Result.GetHelpText());
+            }
+
+            Run(config);
 
             if (Debugger.IsAttached)
             {
@@ -23,19 +49,35 @@ namespace SpaceBender.EventLogAggregator
                 Console.ReadLine();
             }
         }
-        static void Run(string[] args)
+        static void Run(Configuration arguments)
         {
-            //args = new[] { @"D:\Desktop\TPI_test\transformed\tc1web1 sensenet.xml" };
-            //args = new[] { @"D:\Desktop\SenseNet.xml" };
-            args = new[] { @"D:\Desktop\SenseNet.evtx" };
+            var outputDirectory = arguments.OutputDirectory;
 
-            var computerName = args.Length == 0 ? Environment.MachineName : args[0];
-            var outputDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-            var eventsFileName = Path.Combine(outputDirectory, computerName + "-events.txt");
-            var errorsFileName = Path.Combine(outputDirectory, computerName + "-errors.txt");
+            string sourceName = arguments.SourceName;
+            var eventsFileName = arguments.EventsFileName;
+            var errorsFileName = arguments.ErrorsFileName;
 
             var entries = new List<ILogEntry>();
+
+            switch (arguments.SourceType)
+            {
+                case SourceType.LocalComputer:
+                    break;
+                case SourceType.RemoteComputer:
+                    break;
+                case SourceType.XmlFile:
+                    break;
+                case SourceType.EvtxFile:
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+
+
+
+
+            var computerName = arguments.ComputerName;
 
             if (!File.Exists(computerName))
             {
