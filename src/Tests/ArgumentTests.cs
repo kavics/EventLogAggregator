@@ -22,6 +22,7 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
+            Assert.IsFalse(config.SourceIsFile);
             Assert.IsNull(config.FileName);
             Assert.AreEqual(machine, config.ComputerName);
             Assert.AreEqual(log, config.LogName);
@@ -43,6 +44,7 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
+            Assert.IsFalse(config.SourceIsFile);
             Assert.IsNull(config.FileName);
             Assert.AreEqual(machine, config.ComputerName);
             Assert.AreEqual(log, config.LogName);
@@ -64,6 +66,7 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.RemoteComputer, config.SourceType);
+            Assert.IsFalse(config.SourceIsFile);
             Assert.IsNull(config.FileName);
             Assert.AreEqual(machine, config.ComputerName);
             Assert.AreEqual(log, config.LogName);
@@ -85,6 +88,51 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
+            Assert.IsFalse(config.SourceIsFile);
+            Assert.IsNull(config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual($"{machine}_{log}", config.SourceName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-events.txt", config.EventsFileName);
+        }
+        [TestMethod]
+        public void Arguments_LocalSpecificLog()
+        {
+            var machine = Environment.MachineName;
+            var log = Configuration.DefaultLogName + "-1";;
+            var dir = Environment.CurrentDirectory;
+
+            var args = new[] { $"-log:{log}" };
+            var config = new Configuration();
+
+            var result = ArgumentParser.Parse(args, config);
+
+            Assert.IsFalse(result.IsHelp);
+            Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
+            Assert.IsFalse(config.SourceIsFile);
+            Assert.IsNull(config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual($"{machine}_{log}", config.SourceName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-events.txt", config.EventsFileName);
+        }
+        [TestMethod]
+        public void Arguments_RemoteSpecificLog()
+        {
+            var machine = Environment.MachineName + "-1";
+            var log = Configuration.DefaultLogName + "-1"; ;
+            var dir = Environment.CurrentDirectory;
+
+            var args = new[] { machine, $"-log:{log}" };
+            var config = new Configuration();
+
+            var result = ArgumentParser.Parse(args, config);
+
+            Assert.IsFalse(result.IsHelp);
+            Assert.AreEqual(SourceType.RemoteComputer, config.SourceType);
+            Assert.IsFalse(config.SourceIsFile);
             Assert.IsNull(config.FileName);
             Assert.AreEqual(machine, config.ComputerName);
             Assert.AreEqual(log, config.LogName);
@@ -108,6 +156,7 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.XmlFile, config.SourceType);
+            Assert.IsTrue(config.SourceIsFile);
             Assert.AreEqual(file, config.FileName);
             Assert.AreEqual(machine, config.ComputerName);
             Assert.AreEqual(log, config.LogName);
@@ -130,6 +179,7 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.EvtxFile, config.SourceType);
+            Assert.IsTrue(config.SourceIsFile);
             Assert.AreEqual(file, config.FileName);
             Assert.AreEqual(machine, config.ComputerName);
             Assert.AreEqual(log, config.LogName);

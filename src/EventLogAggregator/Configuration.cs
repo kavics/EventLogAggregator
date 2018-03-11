@@ -79,9 +79,7 @@ namespace SpaceBender.EventLogAggregator
                 throw new ArgumentException($"Xml or evtx files are not supported.");
             }
             var name = ComputerName;
-            return string.IsNullOrEmpty(name)
-                ? SourceType.LocalComputer
-                : name == Environment.MachineName ? SourceType.LocalComputer : SourceType.RemoteComputer;
+            return name == Environment.MachineName ? SourceType.LocalComputer : SourceType.RemoteComputer;
         }
 
         public bool SourceIsFile
