@@ -1,10 +1,9 @@
 ﻿using SenseNet.Tools.CommandLineArguments;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ArrangeAccessorOwnerBody
 
 namespace SpaceBender.EventLogAggregator
 {
@@ -20,34 +19,32 @@ namespace SpaceBender.EventLogAggregator
         {
             get
             {
-                if (_computerName == null)
-                    _computerName = string.IsNullOrEmpty(ComputerNameArg) ? Environment.MachineName : ComputerNameArg;
-                return _computerName;
+                return _computerName
+                       ?? (_computerName = string.IsNullOrEmpty(ComputerNameArg) ? Environment.MachineName : ComputerNameArg);
             }
         }
 
-        [CommandLineArgument(aliases: "l, log", helpText: "Name of the log on the specified file.")]
+        [CommandLineArgument(name: "log", aliases: "l, logname", helpText: "Name of the log on the specified file.")]
         private string LogNameArg { get; set; }
         private string _logName;
         public string LogName
         {
             get
             {
-                if (_logName == null)
-                    _logName = string.IsNullOrEmpty(LogNameArg) ? DefaultLogName : LogNameArg;
-                return _logName;
+                return _logName
+                       ?? (_logName = string.IsNullOrEmpty(LogNameArg) ? DefaultLogName : LogNameArg);
             }
         }
 
         private string _fileName;
-        [CommandLineArgument(aliases: "f, file", helpText: "Saved log file. Supported types: evtx or xml. This argument ignores the <computername> and <logname> arguments.")]
+        [CommandLineArgument(name: "file", aliases: "f, filename", helpText: "Saved log file. Supported types: evtx or xml. This argument ignores the <computername> and <logname> arguments.")]
         private string FileNameArg
         {
             get { return _fileName; }
             set
             {
                 _fileName = value;
-                var ext = Path.GetExtension(value).ToLowerInvariant();
+                var ext = Path.GetExtension(value ?? "").ToLowerInvariant();
                 if (ext != ".xml" && ext != ".evtx")
                     throw new ArgumentException($"File type {ext} is notsupported. Select .xml or .evtx file");
             }
@@ -76,7 +73,7 @@ namespace SpaceBender.EventLogAggregator
                     return SourceType.XmlFile;
                 if (".evtx" == ext)
                     return SourceType.EvtxFile;
-                throw new ArgumentException($"Xml or evtx files are not supported.");
+                throw new ArgumentException("Xml or evtx files are not supported.");
             }
             var name = ComputerName;
             return name == Environment.MachineName ? SourceType.LocalComputer : SourceType.RemoteComputer;
@@ -117,9 +114,8 @@ namespace SpaceBender.EventLogAggregator
         {
             get
             {
-                if(_eventsFileName == null)
-                    _eventsFileName = Path.Combine(OutputDirectory, SourceName + "-events.txt");
-                return _eventsFileName;
+                return _eventsFileName
+                       ?? (_eventsFileName = Path.Combine(OutputDirectory, SourceName + "-events.txt"));
             }
         }
 
@@ -128,9 +124,8 @@ namespace SpaceBender.EventLogAggregator
         {
             get
             {
-                if (_errorsFileName == null)
-                    _errorsFileName = Path.Combine(OutputDirectory, SourceName + "-errors.txt");
-                return _errorsFileName;
+                return _errorsFileName
+                       ?? (_errorsFileName = Path.Combine(OutputDirectory, SourceName + "-errors.txt"));
             }
         }
 
@@ -139,9 +134,8 @@ namespace SpaceBender.EventLogAggregator
         {
             get
             {
-                if(_outputDirectory == null)
-                    _outputDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                return _outputDirectory;
+                return _outputDirectory
+                       ?? (_outputDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
             }
         }
     }

@@ -11,9 +11,9 @@ namespace SpaceBender.EventLogAggregator
         public string Message { get; set; }
         public string StackTrace { get; set; }
 
-        public override int GetHashCode()
+        public int GetKey()
         {
-            return (EntryType.ToString() + Name).GetHashCode();
+            return (EntryType + Name).GetHashCode();
         }
 
         internal static DetailedLogEntry Create(ILogEntry entry)
@@ -36,11 +36,11 @@ namespace SpaceBender.EventLogAggregator
                 && entry.EntryType != EventLogEntryType.Information)
                 return null;
 
-            var p0 = entry.Message.IndexOf(from);
+            var p0 = entry.Message.IndexOf(from, StringComparison.Ordinal);
             if (p0 < 0)
                 return null;
 
-            var p1 = entry.Message.IndexOf(to, p0);
+            var p1 = entry.Message.IndexOf(to, p0, StringComparison.Ordinal);
             if (p1 <= p0)
                 return null;
 
@@ -48,7 +48,7 @@ namespace SpaceBender.EventLogAggregator
         }
 
 
-        static string[] names = new[] {
+        static readonly string[] Names = {
             "The server failed to resume the transaction.",
             "Cannot perform the operation because another process is making changes on this path:",
             "Version of a content was not found.",
@@ -66,7 +66,7 @@ namespace SpaceBender.EventLogAggregator
             if (message == null)
                 return string.Empty;
 
-            foreach (var name in names)
+            foreach (var name in Names)
                 if (message.Contains(name))
                     return name;
             return message;

@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SpaceBender.EventLogAggregator
 {
@@ -14,24 +11,14 @@ namespace SpaceBender.EventLogAggregator
     {
         static void Main(string[] args)
         {
-            //args = new[] { @"-file:D:\Desktop\TPI_test\transformed\tc1web1 sensenet.xml" };
-            //args = new[] { @"-file:D:\Desktop\SenseNet.xml" };
-            //args = new[] { @"-file:D:\Desktop\SenseNet.evtx" };
-
             var config = new Configuration();
             try
             {
                 var result = ArgumentParser.Parse(args, config);
                 if (result.IsHelp)
-                {
-                    // settings' properties are not filled, display the usage screen and exit
                     Console.WriteLine(result.GetHelpText());
-                }
                 else
-                {
-                    // execute main logic with a filled config object
                     Run(config);
-                }
             }
             catch (ParsingException e)
             {
@@ -109,9 +96,8 @@ namespace SpaceBender.EventLogAggregator
             var grouped = new Dictionary<int, List<DetailedLogEntry>>();
             foreach (var entry in detailedEntries)
             {
-                List<DetailedLogEntry> list;
-                var key = entry.GetHashCode();
-                if (!grouped.TryGetValue(key, out list))
+                var key = entry.GetKey();
+                if (!grouped.TryGetValue(key, out var list))
                 {
                     list = new List<DetailedLogEntry>();
                     grouped.Add(key, list);
@@ -130,8 +116,8 @@ namespace SpaceBender.EventLogAggregator
                 Console.WriteLine("Writing aggregated errors to {0}", config.ErrorsFileName);
                 writer.WriteLine("Source:        {0}", config.SourceIsFile ? config.FileName : config.ComputerName);
                 writer.WriteLine("Log:           {0}", config.SourceIsFile ? "" : config.LogName);
-                writer.WriteLine("First event:   {0}", firstTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
-                writer.WriteLine("Last event :   {0}", lastTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
+                writer.WriteLine("First event:   {0:yyyy-MM-dd HH:mm:ss.fffff}", firstTime);
+                writer.WriteLine("Last event :   {0:yyyy-MM-dd HH:mm:ss.fffff}", lastTime);
                 writer.WriteLine("Event count:   {0}", entryCount);
                 writer.WriteLine("Error count:   {0}", errorCount);
                 writer.WriteLine("Warning count: {0}", warningCount);
@@ -175,8 +161,7 @@ namespace SpaceBender.EventLogAggregator
                         var messageLines = GetMessageLines(item.StackTrace) ?? item.Message;
                         var stackLines = GetStackLines(item.StackTrace) ?? string.Empty;
 
-                        Dictionary<string, int> messages;
-                        if (!subGroups.TryGetValue(stackLines, out messages))
+                        if (!subGroups.TryGetValue(stackLines, out var messages))
                         {
                             messages = new Dictionary<string, int>();
                             subGroups.Add(stackLines, messages);
@@ -209,8 +194,8 @@ namespace SpaceBender.EventLogAggregator
             using (var writer = new StreamWriter(config.EventsFileName))
             {
                 Console.WriteLine("Writing all events to        {0}", config.EventsFileName);
-                writer.WriteLine("First event: {0}", firstTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
-                writer.WriteLine("Last event : {0}", lastTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
+                writer.WriteLine("First event: {0:yyyy-MM-dd HH:mm:ss.fffff}", firstTime);
+                writer.WriteLine("Last event : {0:yyyy-MM-dd HH:mm:ss.fffff}", lastTime);
                 writer.WriteLine("Entry count: {0}", entryCount);
                 writer.WriteLine("##########################################################################");
 
@@ -253,16 +238,13 @@ namespace SpaceBender.EventLogAggregator
             writer.WriteLine("MachineName:    {0}", entry.MachineName);
             //writer.WriteLine("ReplacementStrings: {0}", string.Join("|", entry.ReplacementStrings));
             writer.WriteLine("Source:         {0}", entry.Source);
-            writer.WriteLine("TimeGenerated:  {0}", entry.TimeGenerated.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
-            writer.WriteLine("TimeWritten:    {0}", entry.TimeWritten.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
+            writer.WriteLine("TimeGenerated:  {0:yyyy-MM-dd HH:mm:ss.fffff}", entry.TimeGenerated);
+            writer.WriteLine("TimeWritten:    {0:yyyy-MM-dd HH:mm:ss.fffff}", entry.TimeWritten);
             writer.WriteLine("UserName:       {0}", entry.UserName);
 
             writer.WriteLine("Message:");
             writer.WriteLine(entry.Message);
             writer.WriteLine();
         }
-
-
-
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
 namespace SpaceBender.EventLogAggregator
 {
@@ -53,27 +52,3 @@ namespace SpaceBender.EventLogAggregator
         }
     }
 }
-/*
-Timestamp: 2018. 03. 01. 8:00:36
-Message: Object reference not set to an instance of an object.
-Category: General
-Priority: -1
-EventId: 1
-Severity: Error
-Title:
-Machine: SNPC007
-Application Domain: UnitTestAdapter: Running test
-Process Id: 5480
-Process Name: C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO\2017\ENTERPRISE\COMMON7\IDE\EXTENSIONS\TESTPLATFORM\testhost.x86.exe
-Win32 Thread Id: 15672
-Thread Name: 
-Extended Properties: Messages - NullReferenceException: Object reference not set to an instance of an object.
-   at SenseNet.Communication.Messaging.MsmqChannelProvider.SendToAllQueues(Message message, Boolean debugMessage) in D:\dev\tfs\SenseNet\Releases\enterprise\v6.5\servicepack\Source\SenseNet\Storage\DistributedApplication\Messaging\MsmqChannel.cs:line 157
-   at SenseNet.Communication.Messaging.MsmqChannelProvider.InternalSend(Stream messageBody, Boolean debugMessage) in D:\dev\tfs\SenseNet\Releases\enterprise\v6.5\servicepack\Source\SenseNet\Storage\DistributedApplication\Messaging\MsmqChannel.cs:line 229
-   at SenseNet.Communication.Messaging.ClusterChannel.Send(ClusterMessage message) in D:\dev\tfs\SenseNet\Releases\enterprise\v6.5\servicepack\Source\SenseNet\Storage\DistributedApplication\Messaging\ClusterChannel.cs:line 107
-=====================
-
-UserName - \
-WorkingMode - 
-IsHttpContext - no
-*/

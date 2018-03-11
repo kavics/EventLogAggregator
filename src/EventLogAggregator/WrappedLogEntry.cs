@@ -7,19 +7,19 @@ namespace SpaceBender.EventLogAggregator
     {
         EventLogEntry _source;
 
-        public string Category { get { return _source.Category; } }
-        public short CategoryNumber { get { return _source.CategoryNumber; } }
-        public byte[] Data { get { return _source.Data; } }
-        public EventLogEntryType EntryType { get { return _source.EntryType; } }
-        public int Index { get { return _source.Index; } }
-        public long InstanceId { get { return _source.InstanceId; } }
-        public string MachineName { get { return _source.MachineName; } }
-        public string Message { get { return _source.Message; } }
-        public string[] ReplacementStrings { get { return _source.ReplacementStrings; } }
-        public string Source { get { return _source.Source; } }
-        public DateTime TimeGenerated { get { return _source.TimeGenerated; } }
-        public DateTime TimeWritten { get { return _source.TimeWritten; } }
-        public string UserName { get { return _source.UserName; } }
+        public string Category => _source.Category;
+        public short CategoryNumber => _source.CategoryNumber;
+        public byte[] Data => _source.Data;
+        public EventLogEntryType EntryType => _source.EntryType;
+        public int Index => _source.Index;
+        public long InstanceId => _source.InstanceId;
+        public string MachineName => _source.MachineName;
+        public string Message => _source.Message;
+        public string[] ReplacementStrings => _source.ReplacementStrings;
+        public string Source => _source.Source;
+        public DateTime TimeGenerated => _source.TimeGenerated;
+        public DateTime TimeWritten => _source.TimeWritten;
+        public string UserName => _source.UserName;
 
         public WrappedLogEntry(EventLogEntry source)
         {
