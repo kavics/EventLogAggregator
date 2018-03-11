@@ -19,14 +19,27 @@ namespace SpaceBender.EventLogAggregator
         {
             get { return string.IsNullOrEmpty(ComputerNameArg) ? Environment.MachineName : ComputerNameArg; }
         }
+
         [CommandLineArgument(aliases: "l, log", helpText: "Name of the log on the specified file.")]
         private string LogNameArg { get; set; }
         public string LogName
         {
             get { return string.IsNullOrEmpty(LogNameArg) ? DefaultLogName : LogNameArg; }
         }
+
+        private string _fileName;
         [CommandLineArgument(aliases: "f, file", helpText: "Saved log file. Supported types: evtx or xml. This argument ignores the <computername> and <logname> arguments.")]
-        public string FileName { get; set; }
+        public string FileName
+        {
+            get { return _fileName; }
+            set
+            {
+                _fileName = value;
+                var ext = Path.GetExtension(value).ToLowerInvariant();
+                if (ext != ".xml" && ext != ".evtx")
+                    throw new ArgumentException($"File type {ext} is notsupported. Select .xml or .evtx file");
+            }
+        }
 
         public SourceType SourceType
         {

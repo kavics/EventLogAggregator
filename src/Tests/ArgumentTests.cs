@@ -8,11 +8,13 @@ namespace Tests
     [TestClass]
     public class ArgumentTests
     {
-        
-
         [TestMethod]
         public void Arguments_Empty()
         {
+            var machine = Environment.MachineName;
+            var log = Configuration.DefaultLogName;
+            var dir = Environment.CurrentDirectory;
+
             var args = new string[0];
             var config = new Configuration();
 
@@ -20,66 +22,139 @@ namespace Tests
 
             Assert.IsFalse(result.IsHelp);
             Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
-            Assert.AreEqual(Environment.MachineName, config.ComputerName);
-            Assert.AreEqual(Configuration.DefaultLogName, config.LogName);
-            Assert.AreEqual($"{Environment.MachineName}_{Configuration.DefaultLogName}", config.SourceName);
-            Assert.AreEqual($"{Environment.CurrentDirectory}\\{Environment.MachineName}_{Configuration.DefaultLogName}-errors.txt", config.ErrorsFileName);
-            Assert.AreEqual($"{Environment.CurrentDirectory}\\{Environment.MachineName}_{Configuration.DefaultLogName}-events.txt", config.EventsFileName);
+            Assert.IsNull(config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual($"{machine}_{log}", config.SourceName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-events.txt", config.EventsFileName);
         }
+        [TestMethod]
+        public void Arguments_RemoteLocal()
+        {
+            var machine = Environment.MachineName;
+            var log = Configuration.DefaultLogName;
+            var dir = Environment.CurrentDirectory;
 
+            var args = new[] { machine };
+            var config = new Configuration();
 
+            var result = ArgumentParser.Parse(args, config);
 
-
-
+            Assert.IsFalse(result.IsHelp);
+            Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
+            Assert.IsNull(config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual($"{machine}_{log}", config.SourceName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-events.txt", config.EventsFileName);
+        }
         [TestMethod]
         public void Arguments_Remote()
         {
-Assert.Inconclusive();
+            var machine = Environment.MachineName + "-1";
+            var log = Configuration.DefaultLogName;
+            var dir = Environment.CurrentDirectory;
 
-            var args = new[] { "NEPTUN" };
-            var arguments = new Configuration();
+            var args = new[] { machine };
+            var config = new Configuration();
 
-            var result = ArgumentParser.Parse(args, arguments);
+            var result = ArgumentParser.Parse(args, config);
 
             Assert.IsFalse(result.IsHelp);
-            Assert.AreEqual("NEPTUN", arguments.ComputerName);
+            Assert.AreEqual(SourceType.RemoteComputer, config.SourceType);
+            Assert.IsNull(config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual($"{machine}_{log}", config.SourceName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-events.txt", config.EventsFileName);
         }
+        [TestMethod]
+        public void Arguments_EmptyComputer()
+        {
+            var machine = Environment.MachineName;
+            var log = Configuration.DefaultLogName;
+            var dir = Environment.CurrentDirectory;
+
+            var args = new[] { "" };
+            var config = new Configuration();
+
+            var result = ArgumentParser.Parse(args, config);
+
+            Assert.IsFalse(result.IsHelp);
+            Assert.AreEqual(SourceType.LocalComputer, config.SourceType);
+            Assert.IsNull(config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual($"{machine}_{log}", config.SourceName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{dir}\\{machine}_{log}-events.txt", config.EventsFileName);
+        }
+
         [TestMethod]
         public void Arguments_XmlFile()
         {
-Assert.Inconclusive();
+            var machine = Environment.MachineName;
+            var log = Configuration.DefaultLogName;
+            var dir = Environment.CurrentDirectory;
+            var file = "c:\\log.xml";
 
-            var args = new[] { "-file:c:\\log.xml" };
-            var arguments = new Configuration();
+            var args = new[] { $"-file:{file}" };
+            var config = new Configuration();
 
-            var result = ArgumentParser.Parse(args, arguments);
+            var result = ArgumentParser.Parse(args, config);
 
             Assert.IsFalse(result.IsHelp);
-            Assert.AreEqual("c:\\log.xml", arguments.FileName);
+            Assert.AreEqual(SourceType.XmlFile, config.SourceType);
+            Assert.AreEqual(file, config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual(file, config.SourceName);
+            Assert.AreEqual($"{file}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{file}-events.txt", config.EventsFileName);
         }
         [TestMethod]
         public void Arguments_EvtxFile()
         {
-Assert.Inconclusive();
+            var machine = Environment.MachineName;
+            var log = Configuration.DefaultLogName;
+            var dir = Environment.CurrentDirectory;
+            var file = "c:\\log.evtx";
 
-            var args = new[] { "-file:c:\\log.evtx" };
-            var arguments = new Configuration();
+            var args = new[] { $"-file:{file}" };
+            var config = new Configuration();
 
-            var result = ArgumentParser.Parse(args, arguments);
+            var result = ArgumentParser.Parse(args, config);
 
             Assert.IsFalse(result.IsHelp);
-            Assert.AreEqual("c:\\log.evtx", arguments.FileName);
+            Assert.AreEqual(SourceType.EvtxFile, config.SourceType);
+            Assert.AreEqual(file, config.FileName);
+            Assert.AreEqual(machine, config.ComputerName);
+            Assert.AreEqual(log, config.LogName);
+            Assert.AreEqual(file, config.SourceName);
+            Assert.AreEqual($"{file}-errors.txt", config.ErrorsFileName);
+            Assert.AreEqual($"{file}-events.txt", config.EventsFileName);
         }
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Arguments_UnknownFile()
         {
-Assert.Inconclusive();
-
             var args = new[] { "-file:c:\\log" };
-            var arguments = new Configuration();
+            var config = new Configuration();
 
-            var result = ArgumentParser.Parse(args, arguments);
+            try
+            {
+                var result = ArgumentParser.Parse(args, config);
+                Assert.Fail("ArgumentException was not thrown.");
+            }
+            catch(Exception e)
+            {
+                if (e is System.Reflection.TargetInvocationException)
+                    e = e.InnerException;
+                if(!(e is ArgumentException))
+                    Assert.Fail("ArgumentException was not thrown.");
+            }
         }
     }
 }
