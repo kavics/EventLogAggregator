@@ -12,13 +12,11 @@ namespace SpaceBender.EventLogAggregator
 {
     class Program
     {
-        const string SnLogName = "SenseNet";
-
         static void Main(string[] args)
         {
-            //args = new[] { @"D:\Desktop\TPI_test\transformed\tc1web1 sensenet.xml" };
-            //args = new[] { @"D:\Desktop\SenseNet.xml" };
-            //args = new[] { @"D:\Desktop\SenseNet.evtx" };
+            //args = new[] { @"-file:D:\Desktop\TPI_test\transformed\tc1web1 sensenet.xml" };
+            //args = new[] { @"-file:D:\Desktop\SenseNet.xml" };
+            //args = new[] { @"-file:D:\Desktop\SenseNet.evtx" };
 
             var config = new Configuration();
             try
@@ -41,63 +39,40 @@ namespace SpaceBender.EventLogAggregator
                 Console.WriteLine(e.Result.GetHelpText());
             }
 
-            Run(config);
-
             if (Debugger.IsAttached)
             {
                 Console.Write("Press <enter> to exit...");
                 Console.ReadLine();
             }
         }
-        static void Run(Configuration arguments)
+        static void Run(Configuration config)
         {
-            var outputDirectory = arguments.OutputDirectory;
-
-            string sourceName = arguments.SourceName;
-            var eventsFileName = arguments.EventsFileName;
-            var errorsFileName = arguments.ErrorsFileName;
-
             var entries = new List<ILogEntry>();
 
-            switch (arguments.SourceType)
+            if (config.SourceIsFile)
             {
-                case SourceType.LocalComputer:
-                    break;
-                case SourceType.RemoteComputer:
-                    break;
-                case SourceType.XmlFile:
-                    break;
-                case SourceType.EvtxFile:
-                    break;
-                default:
+                if (config.SourceType == SourceType.EvtxFile)
+                    entries = LoadedLogEntry.LoadFromEvtx(config.FileName);
+                else if (config.SourceType == SourceType.XmlFile)
+                    entries = LoadedLogEntry.LoadFromXml(config.FileName);
+                else
                     throw new NotSupportedException();
             }
-
-
-
-
-
-            var computerName = arguments.ComputerName;
-
-            if (!File.Exists(computerName))
+            else
             {
-                var logs = computerName == null ? EventLog.GetEventLogs() : EventLog.GetEventLogs(computerName);
-                var snLog = logs.FirstOrDefault(l => l.Log == SnLogName);
+                var logs = config.SourceType == SourceType.LocalComputer ? EventLog.GetEventLogs() : EventLog.GetEventLogs(config.ComputerName);
+                var snLog = logs.FirstOrDefault(l => l.Log == config.LogName);
                 if (snLog == null)
                 {
-                    Console.WriteLine("EventLog '{0}' was not found.", SnLogName);
+                    Console.WriteLine("EventLog '{0}' was not found.", config.LogName);
                     return;
                 }
                 foreach (var item in snLog.Entries)
                     entries.Add(new WrappedLogEntry((EventLogEntry)item));
             }
-            else
-            {
-                entries = LoadedLogEntry.LoadFrom(computerName);
-            }
 
-            Console.WriteLine("Source: {0}", computerName ?? "<local>");
-            //Console.WriteLine("  Log name = \t\t {0}", snLog.Log);
+            Console.WriteLine("Source: {0}", config.ComputerName ?? "<local>");
+            Console.WriteLine("  Log name = \t\t {0}", config.LogName);
             Console.WriteLine("  Number of events = \t {0}", entries.Count.ToString());
             Console.WriteLine("-----------------------------------------------------------------");
 
@@ -150,10 +125,11 @@ namespace SpaceBender.EventLogAggregator
                 .ThenByDescending(i => i.First().Message)
                 .ToArray();
 
-            using (var writer = new StreamWriter(errorsFileName))
+            using (var writer = new StreamWriter(config.ErrorsFileName))
             {
-                Console.WriteLine("Writing aggregated errors to {0}", errorsFileName);
-                writer.WriteLine("Source:        {0}", computerName);
+                Console.WriteLine("Writing aggregated errors to {0}", config.ErrorsFileName);
+                writer.WriteLine("Source:        {0}", config.SourceIsFile ? config.FileName : config.ComputerName);
+                writer.WriteLine("Log:           {0}", config.SourceIsFile ? "" : config.LogName);
                 writer.WriteLine("First event:   {0}", firstTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
                 writer.WriteLine("Last event :   {0}", lastTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
                 writer.WriteLine("Event count:   {0}", entryCount);
@@ -230,9 +206,9 @@ namespace SpaceBender.EventLogAggregator
                 }
             }
 
-            using (var writer = new StreamWriter(eventsFileName))
+            using (var writer = new StreamWriter(config.EventsFileName))
             {
-                Console.WriteLine("Writing all events to        {0}", eventsFileName);
+                Console.WriteLine("Writing all events to        {0}", config.EventsFileName);
                 writer.WriteLine("First event: {0}", firstTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
                 writer.WriteLine("Last event : {0}", lastTime.ToString("yyyy-MM-dd HH:mm:ss.fffff"));
                 writer.WriteLine("Entry count: {0}", entryCount);

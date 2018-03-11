@@ -24,16 +24,7 @@ namespace SpaceBender.EventLogAggregator
         public DateTime TimeWritten { get; private set; }
         public string UserName { get; private set; }
 
-        internal static List<ILogEntry> LoadFrom(string fileName)
-        {
-            var ext = Path.GetExtension(fileName).Trim('.').ToLowerInvariant();
-            if (ext == "xml")
-                return LoadFromXml(fileName);
-            if (ext == "evtx")
-                return LoadFromEvtx(fileName);
-            throw new NotSupportedException("File type is not supported: " + ext);
-        }
-        private static List<ILogEntry> LoadFromEvtx(string fileName)
+        public static List<ILogEntry> LoadFromEvtx(string fileName)
         {
             var result = new List<ILogEntry>();
             EventRecord record;
@@ -43,7 +34,7 @@ namespace SpaceBender.EventLogAggregator
                         result.Add(new WrappedEventRecord(record));
             return result;
         }
-        private static List<ILogEntry> LoadFromXml(string fileName)
+        public static List<ILogEntry> LoadFromXml(string fileName)
         {
             var xml = new XmlDocument();
             var nsmgr = new XmlNamespaceManager(xml.NameTable);
